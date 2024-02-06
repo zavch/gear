@@ -3,7 +3,6 @@ package com.github.zavch.gear;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 
 import java.time.*;
 import java.util.Base64;
@@ -52,8 +51,16 @@ public class ToolViewController {
     @FXML
     public void date2time(ActionEvent actionEvent) {
         LocalDate localDate = date.getValue();
-        LocalTime localTime = LocalTime.of(hour.getValue(), min.getValue(),
-                second.getValue(), millisecond.getValue() * 1_000_000);
+        if (localDate == null) {
+            showErrorAlert("日期不能为空");
+            return;
+        }
+        Integer hourValue = hour.getValue();
+        Integer minValue = min.getValue();
+        Integer secondValue = second.getValue();
+        Integer millisecondValue = millisecond.getValue();
+        LocalTime localTime = LocalTime.of(hourValue, minValue,
+                secondValue, millisecondValue * 1_000_000);
         LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
         time.setText(String.valueOf(localDateTime.atZone(ZoneId.systemDefault())
                 .toInstant().toEpochMilli()));
