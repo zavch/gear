@@ -5,4 +5,6 @@ module com.github.zavch.gear {
 
     opens com.github.zavch.gear to javafx.fxml;
     exports com.github.zavch.gear;
+    exports com.github.zavch.gear.controller;
+    opens com.github.zavch.gear.controller to javafx.fxml;
 }

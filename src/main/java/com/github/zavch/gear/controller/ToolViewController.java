@@ -1,5 +1,6 @@
-package com.github.zavch.gear;
+package com.github.zavch.gear.controller;
 
+import com.github.zavch.gear.util.JsonUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -62,7 +63,7 @@ public class ToolViewController {
         }
         try {
             byte[] decode = Base64.getDecoder().decode(parts[1]);
-            payload.setText(new String(decode));
+            payload.setText(JsonUtils.format(new String(decode)));
         } catch (Exception e) {
             showErrorAlert("JWT格式错误");
         }
