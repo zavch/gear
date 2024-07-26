@@ -1,12 +1,17 @@
 package com.github.zavch.gear.controller;
 
+import com.github.zavch.gear.bridge.JsBridge;
 import com.github.zavch.gear.util.JsonUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import netscape.javascript.JSObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +22,7 @@ import java.nio.file.Paths;
 import java.time.*;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,6 +56,13 @@ public class ToolViewController {
     private Button fileChooseButton;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private TextField url;
+    @FXML
+    private Button search;
+    @FXML
+    private WebView webView;
+    private WebEngine engine;
     private File file;
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
@@ -183,8 +196,30 @@ public class ToolViewController {
         }
     }
 
+    @FXML
+    public void search(ActionEvent actionEvent) {
+        String value = url.getText();
+        if (value.isEmpty()) {
+            engine.load(Objects.requireNonNull(ToolViewController.class.getResource("/js-bridge-demo.html")).toExternalForm());
+        } else {
+            engine.load(value);
+        }
+    }
+
     public void initialize() {
         fileType.getItems().addAll(PACKAGE_LOCK_JSON);
         fileType.setValue(PACKAGE_LOCK_JSON);
+        engine = webView.getEngine();
+        engine.setOnAlert(event -> {
+            showInfoAlert(event.getData());
+        });
+        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.SUCCEEDED) {
+                JSObject window = (JSObject) engine.executeScript("window");
+                window.setMember("jsBridge", new JsBridge());
+                window.setMember("version", "1.0.0");
+                engine.executeScript("const event = new Event('jsBridgeReady');document.dispatchEvent(event);");
+            }
+        });
     }
 }

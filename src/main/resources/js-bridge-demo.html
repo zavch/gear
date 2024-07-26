@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>js-bridge-demo</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>测试</h1>
+        <button onclick="echo()">echo</button>
+        <script>
+            document.addEventListener("jsBridgeReady", function() {
+                alert("init => " + jsBridge);
+            })
+            function echo() {
+                alert(jsBridge.echo(version));
+            }
+        </script>
+    </body>
+</html>
